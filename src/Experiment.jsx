@@ -1,15 +1,20 @@
-import React, {Component} from "react";
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import CoreExperiment from "./CoreExperiment";
 import emitter from "./emitter";
-import store from './store';
-import calculateActiveVariant from './calculateActiveVariant';
+import { getStore } from "./store";
+import calculateActiveVariant from "./calculateActiveVariant";
+import { ABConsumer } from "./Provider";
 
-emitter.addActiveVariantListener(function (experimentName, variantName, skipSave) {
+emitter.addActiveVariantListener(function(
+  experimentName,
+  variantName,
+  skipSave
+) {
   if (skipSave) {
     return;
   }
-  store.setItem('PUSHTELL-' + experimentName, variantName);
+  getStore().setItem("PUSHTELL-" + experimentName, variantName);
 });
 
 export default class Experiment extends Component {
@@ -25,12 +30,25 @@ export default class Experiment extends Component {
     emitter.emitWin(this.props.name);
   };
 
-
-  getActiveVariant = () => {
-    return calculateActiveVariant(this.props.name, this.props.userIdentifier, this.props.defaultVariantName);
-  }
+  getActiveVariant = store => {
+    return calculateActiveVariant(
+      this.props.name,
+      this.props.userIdentifier,
+      this.props.defaultVariantName,
+      store
+    );
+  };
 
   render() {
-    return <CoreExperiment {...this.props} value={this.getActiveVariant}/>;
+    return (
+      <ABConsumer>
+        {store => (
+          <CoreExperiment
+            {...this.props}
+            value={this.getActiveVariant.bind(this, store)}
+          />
+        )}
+      </ABConsumer>
+    );
   }
 }

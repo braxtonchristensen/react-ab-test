@@ -1,25 +1,35 @@
+// import { getABContext } from "./Provider";
 let store;
 
-const noopStore = {
-  getItem: function() {},
-  setItem: function() {}
+export const configureStore = passedStore => {
+  store = passedStore;
+  return store;
 };
 
-if (typeof window !== "undefined" && "localStorage" in window) {
-  try {
-    let key = "__pushtell_react__";
-    window.localStorage.setItem(key, key);
-    if (window.localStorage.getItem(key) !== key) {
-      store = noopStore;
-    } else {
-      window.localStorage.removeItem(key);
-      store = window.localStorage;
-    }
-  } catch (e) {
-    store = noopStore;
-  }
-} else {
-  store = noopStore;
-}
+export const getStore = () => store;
 
-export default store;
+// const noopStore = {
+//   getItem: function() {},
+//   setItem: function() {}
+// };
+
+// store = getABContext();
+
+// if (store) {
+//   try {
+//     let key = "__pushtell_react__";
+//     window.localStorage.setItem(key, key);
+//     if (window.localStorage.getItem(key) !== key) {
+//       store = noopStore;
+//     } else {
+//       window.localStorage.removeItem(key);
+//       store = window.localStorage;
+//     }
+//   } catch (e) {
+//     store = noopStore;
+//   }
+// } else {
+//   store = noopStore;
+// }
+
+// export default store;

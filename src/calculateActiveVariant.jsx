@@ -1,6 +1,6 @@
 import crc32 from "fbjs/lib/crc32";
 import emitter from "./emitter";
-import store from "./store";
+// import store from "./store";
 
 const calculateVariant = (experimentName, userIdentifier) => {
   /*
@@ -49,7 +49,7 @@ const calculateVariant = (experimentName, userIdentifier) => {
   return selectedVariant;
 };
 
-export default (experimentName, userIdentifier, defaultVariantName) => {
+export default (experimentName, userIdentifier, defaultVariantName, store) => {
   if (typeof userIdentifier === "string") {
     return calculateVariant(experimentName, userIdentifier);
   }
