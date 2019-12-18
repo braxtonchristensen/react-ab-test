@@ -52,7 +52,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "doctoc . --github --title '<h1>Table of Contents</h1>'; babel src --out-dir lib;",
+    "build": "babel src --out-dir lib;",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
