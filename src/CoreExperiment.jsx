@@ -1,16 +1,13 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import warning from 'fbjs/lib/warning';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import warning from "fbjs/lib/warning";
 import emitter from "./emitter";
 import Variant from "./Variant";
 
 export default class CoreExperiment extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func
-    ]).isRequired
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired
   };
 
   win = () => {
@@ -26,8 +23,13 @@ export default class CoreExperiment extends Component {
 
     let children = {};
     React.Children.forEach(props.children, element => {
-      if (!React.isValidElement(element) || element.type.displayName !== "Pushtell.Variant") {
-        let error = new Error("Pushtell Experiment children must be Pushtell Variant components.");
+      if (
+        !React.isValidElement(element) ||
+        element.type.displayName !== "Pushtell.Variant"
+      ) {
+        let error = new Error(
+          "Pushtell Experiment children must be Pushtell Variant components."
+        );
         error.type = "PUSHTELL_INVALID_CHILD";
         throw error;
       }
@@ -38,9 +40,15 @@ export default class CoreExperiment extends Component {
     this.state.variants = children;
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.value !== this.props.value || nextProps.children !== this.props.children) {
-      let value = typeof nextProps.value === "function" ? nextProps.value() : nextProps.value;
+  async componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.value !== this.props.value ||
+      nextProps.children !== this.props.children
+    ) {
+      let value =
+        typeof nextProps.value === "function"
+          ? await nextProps.value()
+          : nextProps.value;
       let children = {};
       React.Children.forEach(nextProps.children, element => {
         children[element.props.name] = element;
@@ -52,11 +60,21 @@ export default class CoreExperiment extends Component {
     }
   }
 
-  componentWillMount() {
-    let value = typeof this.props.value === "function" ? this.props.value() : this.props.value;
+  async componentWillMount() {
+    let value =
+      typeof this.props.value === "function"
+        ? await this.props.value()
+        : this.props.value;
     if (!this.state.variants[value]) {
       if ("production" !== process.env.NODE_ENV) {
-        warning(true, 'Experiment “' + this.props.name + '” does not contain variant “' + value + '”');
+        warning(
+          true,
+          "Experiment “" +
+            this.props.name +
+            "” does not contain variant “" +
+            value +
+            "”"
+        );
       }
     }
     emitter._incrementActiveExperiments(this.props.name);
@@ -65,11 +83,14 @@ export default class CoreExperiment extends Component {
     this.setState({
       value: value
     });
-    this.valueSubscription = emitter.addActiveVariantListener(this.props.name, (experimentName, variantName) => {
-      this.setState({
-        value: variantName
-      });
-    });
+    this.valueSubscription = emitter.addActiveVariantListener(
+      this.props.name,
+      (experimentName, variantName) => {
+        this.setState({
+          value: variantName
+        });
+      }
+    );
   }
 
   componentWillUnmount() {
@@ -80,4 +101,4 @@ export default class CoreExperiment extends Component {
   render() {
     return this.state.variants[this.state.value] || null;
   }
-};
+}

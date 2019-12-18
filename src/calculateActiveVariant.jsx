@@ -49,7 +49,12 @@ const calculateVariant = (experimentName, userIdentifier) => {
   return selectedVariant;
 };
 
-export default (experimentName, userIdentifier, defaultVariantName, store) => {
+const calculateActiveVariant = async (
+  experimentName,
+  userIdentifier,
+  defaultVariantName,
+  store
+) => {
   if (typeof userIdentifier === "string") {
     return calculateVariant(experimentName, userIdentifier);
   }
@@ -57,7 +62,7 @@ export default (experimentName, userIdentifier, defaultVariantName, store) => {
   if (typeof activeValue === "string") {
     return activeValue;
   }
-  const storedValue = store.getItem("PUSHTELL-" + experimentName);
+  const storedValue = await store.getItem("PUSHTELL-" + experimentName);
   if (typeof storedValue === "string") {
     emitter.setActiveVariant(experimentName, storedValue, true);
     return storedValue;
@@ -68,3 +73,5 @@ export default (experimentName, userIdentifier, defaultVariantName, store) => {
   }
   return calculateVariant(experimentName);
 };
+
+export default calculateActiveVariant;

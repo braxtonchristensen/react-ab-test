@@ -24,14 +24,16 @@ export default class Experiment extends Component {
     userIdentifier: PropTypes.string
   };
 
+  state = { variant: null };
+
   static displayName = "Pushtell.Experiment";
 
   win = () => {
     emitter.emitWin(this.props.name);
   };
 
-  getActiveVariant = store => {
-    return calculateActiveVariant(
+  getActiveVariant = async store => {
+    return await calculateActiveVariant(
       this.props.name,
       this.props.userIdentifier,
       this.props.defaultVariantName,

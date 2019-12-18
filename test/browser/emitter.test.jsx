@@ -1,24 +1,24 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import UUID from 'uuid/v4';
-import { mount } from 'enzyme';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import UUID from "uuid/v4";
+import { mount } from "enzyme";
 
-import Experiment from '../../src/CoreExperiment.jsx';
-import Variant from '../../src/Variant.jsx';
-import emitter from '../../src/emitter.jsx';
+import Experiment from "../../src/CoreExperiment.jsx";
+import Variant from "../../src/Variant.jsx";
+import emitter from "../../src/emitter.jsx";
 
-describe('Emitter', () => {
+describe("Emitter", () => {
   afterEach(() => {
     emitter._reset();
   });
 
-  it('should throw an error when passed an invalid name argument.', () => {
+  it("should throw an error when passed an invalid name argument.", () => {
     expect(() => {
       emitter.emitWin(1);
     }).toThrowError(/type \'string\'/);
   });
 
-  it('should emit when a variant is played.', () => {
+  it("should emit when a variant is played.", () => {
     const experimentName = UUID();
     // TODO: use spies?
     let playedVariantName = null;
@@ -50,14 +50,14 @@ describe('Emitter', () => {
       </Experiment>
     );
 
-    expect(playedVariantName).toBe('A');
+    expect(playedVariantName).toBe("A");
     expect(experimentNameGlobal).toBe(experimentName);
-    expect(playedVariantNameGlobal).toBe('A');
+    expect(playedVariantNameGlobal).toBe("A");
     playSubscription.remove();
     playSubscriptionGlobal.remove();
   });
 
-  it('should emit when a variant wins.', () => {
+  it("should emit when a variant wins.", () => {
     const experimentName = UUID();
     let winningVariantName = null;
     let winCallback = function(experimentName, variantName) {
@@ -85,15 +85,15 @@ describe('Emitter', () => {
 
     emitter.emitWin(experimentName);
 
-    expect(winningVariantName).toBe('A');
+    expect(winningVariantName).toBe("A");
     expect(experimentNameGlobal).toBe(experimentName);
-    expect(winningVariantNameGlobal).toBe('A');
+    expect(winningVariantNameGlobal).toBe("A");
 
     winSubscription.remove();
     winSubscriptionGlobal.remove();
   });
 
-  it('should emit when a variant is clicked.', () => {
+  it("should emit when a variant is clicked.", () => {
     let experimentName = UUID();
 
     let winningVariantName = null;
@@ -132,17 +132,17 @@ describe('Emitter', () => {
     }
 
     const wrapper = mount(<App />);
-    wrapper.find('#variant-a').simulate('click');
+    wrapper.find("#variant-a").simulate("click");
 
-    expect(winningVariantName).toBe('A');
+    expect(winningVariantName).toBe("A");
     expect(experimentNameGlobal).toBe(experimentName);
-    expect(winningVariantNameGlobal).toBe('A');
+    expect(winningVariantNameGlobal).toBe("A");
 
     winSubscription.remove();
     winSubscriptionGlobal.remove();
   });
 
-  it('should emit when a variant is chosen.', () => {
+  it("should emit when a variant is chosen.", () => {
     const experimentName = UUID();
     let activeVariantName = null;
     const activeVariantCallback = function(experimentName, variantName) {
@@ -177,15 +177,15 @@ describe('Emitter', () => {
       </Experiment>
     );
 
-    expect(activeVariantName).toBe('A');
+    expect(activeVariantName).toBe("A");
     expect(experimentNameGlobal).toBe(experimentName);
-    expect(activeVariantNameGlobal).toBe('A');
+    expect(activeVariantNameGlobal).toBe("A");
 
     activeVariantSubscription.remove();
     activeVariantSubscriptionGlobal.remove();
   });
 
-  it('should get the experiment value.', () => {
+  it("should get the experiment value.", () => {
     const experimentName = UUID();
 
     const wrapper = mount(
@@ -203,10 +203,10 @@ describe('Emitter', () => {
       </Experiment>
     );
 
-    expect(emitter.getActiveVariant(experimentName)).toBe('A');
+    expect(emitter.getActiveVariant(experimentName)).toBe("A");
   });
 
-  it('should update the rendered component.', () => {
+  it("should update the rendered component.", () => {
     const experimentName = UUID();
 
     const wrapper = mount(
@@ -220,16 +220,16 @@ describe('Emitter', () => {
       </Experiment>
     );
 
-    expect(wrapper.find('#variant-a').exists());
-    expect(!wrapper.find('#variant-b').exists());
+    expect(wrapper.find("#variant-a").exists());
+    expect(!wrapper.find("#variant-b").exists());
 
-    emitter.setActiveVariant(experimentName, 'B');
+    emitter.setActiveVariant(experimentName, "B");
 
-    expect(!wrapper.find('#variant-a').exists());
-    expect(wrapper.find('#variant-b').exists());
+    expect(!wrapper.find("#variant-a").exists());
+    expect(wrapper.find("#variant-b").exists());
   });
 
-  it('should report active components.', () => {
+  it("should report active components.", () => {
     let experimentNameA = UUID();
     let experimentNameB = UUID();
 
@@ -266,8 +266,8 @@ describe('Emitter', () => {
     expect(emitter.getActiveExperiments()).toEqual({
       [experimentNameA]: {
         A: true,
-        B: false,
-      },
+        B: false
+      }
     });
     wrapper.unmount();
 
@@ -275,8 +275,8 @@ describe('Emitter', () => {
     expect(emitter.getActiveExperiments()).toEqual({
       [experimentNameB]: {
         C: true,
-        D: false,
-      },
+        D: false
+      }
     });
     wrapper.unmount();
 
@@ -284,19 +284,19 @@ describe('Emitter', () => {
     expect(emitter.getActiveExperiments()).toEqual({
       [experimentNameA]: {
         A: true,
-        B: false,
+        B: false
       },
       [experimentNameB]: {
         C: true,
-        D: false,
-      },
+        D: false
+      }
     });
   });
 
-  it('should force the calculation of an active variant', () => {
+  it("should force the calculation of an active variant", async () => {
     const experimentName = UUID();
-    emitter.defineVariants(experimentName, ['A', 'B']);
-    const activeVariant = emitter.calculateActiveVariant(experimentName);
+    emitter.defineVariants(experimentName, ["A", "B"]);
+    const activeVariant = await emitter.calculateActiveVariant(experimentName);
     expect(activeVariant).toEqual(emitter.getActiveVariant(experimentName));
   });
 });
