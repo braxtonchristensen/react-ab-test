@@ -823,6 +823,65 @@ Remove `win` and `play` listeners and stop reporting results to Segment.
 
 - **Return Type:** No return value
 
+### `amplitudeHelper`
+
+Sends events to [Amplitude](https://amplitude.com).
+
+#### Usage
+
+When the [`<Experiment />`](#experiment-) is mounted, the helper sends an `Experiment Viewed` event using [`amplitude.logEvent(...)` with `experimentName` and `variationName` properties.
+
+When a [win is emitted](#emitteremitwinexperimentname) the helper sends an `Experiment Won` event using [`amplitude.logEvent(...)`] with `experimentName` and `variationName` properties.
+
+```js
+import React from "react";
+import { Experiment, Variant, amplitudeHelper } from "@marvelapp/react-ab-test";
+import amplitude from "amplitude-js/amplitude";
+
+const amplitudeInstance = amplitude.getInstance().init("amplitude key");
+
+amplitudeHelper.enable(amplitudeInstance);
+
+class App extends React.Component {
+  onButtonClick(e) {
+    emitter.emitWin("My Example");
+    // segmentHelper sends the 'Experiment Won' event, equivalent to:
+    // segment.track('Experiment Won', {experimentName: "My Example", variationName: "A"})
+  }
+  componentWillMount() {
+    // segmentHelper sends the 'Experiment Viewed' event, equivalent to:
+    // segment.track('Experiment Viewed, {experimentName: "My Example", variationName: "A"})
+  }
+  render() {
+    return (
+      <div>
+        <Experiment ref="experiment" name="My Example">
+          <Variant name="A">
+            <div>Section A</div>
+          </Variant>
+          <Variant name="B">
+            <div>Section B</div>
+          </Variant>
+        </Experiment>
+        <button onClick={this.onButtonClick}>Emit a win</button>
+      </div>
+    );
+  }
+}
+```
+
+#### `amplitudeHelper.enable(amplitudeInstance)`
+
+Add listeners to `win` and `play` events and report results to Amplitude.
+
+- **Return Type:** No return value
+
+#### `amplitudeHelper.disable()`
+
+Remove `win` and `play` listeners and stop reporting results to Amplitude.
+
+- **Return Type:** No return value
+
 ## How to contribute
 
 ### Requisites

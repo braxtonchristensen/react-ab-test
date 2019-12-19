@@ -6,5 +6,6 @@ module.exports = {
   emitter: require("./lib/emitter").default,
   experimentDebugger: require("./lib/debugger"),
   mixpanelHelper: require("./lib/helpers/mixpanel").default,
-  segmentHelper: require("./lib/helpers/segment").default
+  segmentHelper: require("./lib/helpers/segment").default,
+  amplitudeHelper: require("./lib/helpers/amplitude").default
 };
