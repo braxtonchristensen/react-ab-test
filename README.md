@@ -37,6 +37,8 @@ Please [★ on GitHub](https://github.com/marvelapp/react-ab-test)!
 
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Web setup](#web-setup)
+  - [Native setup](#native-setup)
   - [Standalone Component](#standalone-component)
   - [Coordinate Multiple Components](#coordinate-multiple-components)
   - [Weighting Variants](#weighting-variants)
@@ -74,6 +76,10 @@ Please [★ on GitHub](https://github.com/marvelapp/react-ab-test)!
     - [Usage](#usage-2)
     - [`segmentHelper.enable()`](#segmenthelperenable)
     - [`segmentHelper.disable()`](#segmenthelperdisable)
+  - [`amplitudeHelper`](#amplitudehelper)
+    - [Usage](#usage-2)
+    - [`amplitudeHelper.enable()`](#amplitudehelperenable)
+    - [`amplitudeHelper.disable()`](#amplitudehelperdisable)
 - [How to contribute](#how-to-contribute)
   - [Requisites](#requisites)
   - [Running Tests](#running-tests)
@@ -90,7 +96,7 @@ yarn add @marvelapp/react-ab-test
 
 ## Usage
 
-### Web. Set up provider with store
+### Web setup
 
 ```js
 import React from "react";
@@ -110,7 +116,7 @@ ReactDOM.render(
 );
 ```
 
-### Native. Set up provider with store
+### Native setup
 
 ```js
 import React from "react";
