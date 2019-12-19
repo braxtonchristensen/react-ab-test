@@ -22,9 +22,9 @@ Report to your analytics provider using the [`emitter`](#emitter). Helpers are a
 
 ```js
 emitter.addPlayListener((experimentName, variantName) => {
-  mixpanel.track('Start Experiment', {
+  mixpanel.track("Start Experiment", {
     name: experimentName,
-    variant: variantName,
+    variant: variantName
   });
 });
 ```
@@ -90,13 +90,71 @@ yarn add @marvelapp/react-ab-test
 
 ## Usage
 
+### Web. Set up provider with store
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import { Provider, store } from "@marvelapp/react-ab-test";
+
+const s = store.configureStore(window.localStorage);
+
+ReactDOM.render(
+  <Provider.ABProvider store={s}>
+    <App />
+  </Provider.ABProvider>,
+  document.getElementById("root")
+);
+```
+
+### Native. Set up provider with store
+
+```js
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { AsyncStorage } from "react-native";
+
+import { store, Provider, Experiment, Variant } from "@marvelapp/react-ab-test";
+
+const s = store.configureStore(AsyncStorage);
+
+export default function App() {
+  return (
+    <Provider.ABProvider store={s}>
+      <View>
+        <Experiment name="My Example">
+          <Variant name="A">
+            <Text>Version A</Text>
+          </Variant>
+          <Variant name="B">
+            <Text>Version B</Text>
+          </Variant>
+        </Experiment>
+      </View>
+    </Provider.ABProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center"
+  }
+});
+```
+
 ### Standalone Component
 
 Try it [on JSFiddle](https://jsfiddle.net/pushtell/m14qvy7r/)
 
 ```js
-import React from 'react';
-import { Experiment, Variant, emitter } from '@marvelapp/react-ab-test';
+import React from "react";
+import { Experiment, Variant, emitter } from "@marvelapp/react-ab-test";
 
 class App extends Component {
   onButtonClick(e) {
@@ -211,11 +269,11 @@ Try it [on JSFiddle](http://jsfiddle.net/pushtell/e2q7xe4f/)
 Use [emitter.defineVariants()](#emitterdefinevariantsexperimentname-variantnames--variantweights) to optionally define the ratios by which variants are chosen.
 
 ```js
-import React from 'react';
-import { Experiment, Variant, emitter } from '@marvelapp/react-ab-test';
+import React from "react";
+import { Experiment, Variant, emitter } from "@marvelapp/react-ab-test";
 
 // Define variants and weights in advance.
-emitter.defineVariants('My Example', ['A', 'B', 'C'], [10, 40, 40]);
+emitter.defineVariants("My Example", ["A", "B", "C"], [10, 40, 40]);
 
 const App = () => {
   return (
@@ -233,24 +291,24 @@ const App = () => {
       </Experiment>
     </div>
   );
-}
+};
 ```
 
 ### Force variant calculation before rendering experiment
+
 There are some scenarios where you may want the active variant of an experiment to be calculated before the experiment is rendered.
 To do so, use [emitter.calculateActiveVariant()](#emittercalculateactivevariantexperimentname--useridentifier-defaultvariantname). Note that this method must
 be called after [emitter.defineVariants()](#emitterdefinevariantsexperimentname-variantnames--variantweights)
 
 ```js
-import { emitter } from '@marvelapp/react-ab-test';
+import { emitter } from "@marvelapp/react-ab-test";
 
 // Define variants in advance
-emitter.defineVariants('My Example', ['A', 'B', 'C']);
-emitter.calculateActiveVariant('My Example', 'userId');
+emitter.defineVariants("My Example", ["A", "B", "C"]);
+emitter.calculateActiveVariant("My Example", "userId");
 
 // Active variant will be defined even if the experiment is not rendered
-const activeVariant = emitter.getActiveVariant('My Example');
-
+const activeVariant = emitter.getActiveVariant("My Example");
 ```
 
 ### Debugging
@@ -264,8 +322,12 @@ The debugger is wrapped in a conditional `if(process.env.NODE_ENV === "productio
 Try it [on JSFiddle](http://jsfiddle.net/pushtell/vs9kkxLd/)
 
 ```js
-import React from 'react';
-import { Experiment, Variant, experimentDebugger } from '@marvelapp/react-ab-test';
+import React from "react";
+import {
+  Experiment,
+  Variant,
+  experimentDebugger
+} from "@marvelapp/react-ab-test";
 
 experimentDebugger.enable();
 
@@ -282,8 +344,8 @@ const App = () => {
       </Experiment>
     </div>
   );
-}
-````
+};
+```
 
 ### Server Rendering
 
@@ -296,13 +358,13 @@ See [`./examples/isomorphic`](https://github.com/pushtell/react-ab-test/tree/dev
 The component in [`Component.jsx`](https://github.com/pushtell/react-ab-test/blob/master/examples/isomorphic/Component.jsx):
 
 ```js
-var React = require('react');
-var Experiment = require('react-ab-test/lib/Experiment');
-var Variant = require('react-ab-test/lib/Variant');
+var React = require("react");
+var Experiment = require("react-ab-test/lib/Experiment");
+var Variant = require("react-ab-test/lib/Variant");
 
 module.exports = React.createClass({
   propTypes: {
-    userIdentifier: React.PropTypes.string.isRequired,
+    userIdentifier: React.PropTypes.string.isRequired
   },
   render: function() {
     return (
@@ -321,47 +383,47 @@ module.exports = React.createClass({
         </Experiment>
       </div>
     );
-  },
+  }
 });
 ```
 
 We use a session ID for the `userIdentifier` property in this example, although a long-lived user ID would be preferable. See [`server.js`](https://github.com/pushtell/react-ab-test/blob/master/examples/isomorphic/server.js):
 
 ```js
-require('babel/register')({ only: /jsx/ });
+require("babel/register")({ only: /jsx/ });
 
-var express = require('express');
-var session = require('express-session');
-var React = require('react');
-var ReactDOMServer = require('react-dom/server');
-var Component = require('./Component.jsx');
-var abEmitter = require('react-ab-test/lib/emitter');
+var express = require("express");
+var session = require("express-session");
+var React = require("react");
+var ReactDOMServer = require("react-dom/server");
+var Component = require("./Component.jsx");
+var abEmitter = require("react-ab-test/lib/emitter");
 
 var app = express();
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 app.use(
   session({
-    secret: 'keyboard cat',
+    secret: "keyboard cat",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: true
   })
 );
 
-app.get('/', function(req, res) {
+app.get("/", function(req, res) {
   var reactElement = React.createElement(Component, {
-    userIdentifier: req.sessionID,
+    userIdentifier: req.sessionID
   });
   var reactString = ReactDOMServer.renderToString(reactElement);
   abEmitter.rewind();
-  res.render('template', {
+  res.render("template", {
     sessionID: req.sessionID,
-    reactOutput: reactString,
+    reactOutput: reactString
   });
 });
 
-app.use(express.static('www'));
+app.use(express.static("www"));
 
 app.listen(8080);
 ```
@@ -371,7 +433,7 @@ Remember to call `abEmitter.rewind()` to prevent memory leaks.
 An [EJS](https://github.com/mde/ejs) template in [`template.ejs`](https://github.com/pushtell/react-ab-test/blob/master/examples/isomorphic/views/template.ejs):
 
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Isomorphic Rendering Example</title>
@@ -389,11 +451,11 @@ An [EJS](https://github.com/mde/ejs) template in [`template.ejs`](https://github
 On the client in [`app.jsx`](https://github.com/pushtell/react-ab-test/blob/master/examples/isomorphic/www/app.jsx):
 
 ```js
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Component = require('../Component.jsx');
+var React = require("react");
+var ReactDOM = require("react-dom");
+var Component = require("../Component.jsx");
 
-var container = document.getElementById('react-mount');
+var container = document.getElementById("react-mount");
 
 ReactDOM.render(<Component userIdentifier={SESSION_ID} />, container);
 ```
@@ -404,18 +466,18 @@ Code from [`./src`](https://github.com/pushtell/react-ab-test/tree/master/src) i
 
 ## Alternative Libraries
 
-* [**react-experiments**](https://github.com/HubSpot/react-experiments) - “A JavaScript library that assists in defining and managing UI experiments in React” by [Hubspot](https://github.com/HubSpot). Uses Facebook's [PlanOut framework](http://facebook.github.io/planout/) via [Hubspot's javascript port](https://github.com/HubSpot/PlanOut.js).
-* [**react-ab**](https://github.com/olahol/react-ab) - “Simple declarative and universal A/B testing component for React” by [Ola Holmström](https://github.com/olahol)
-* [**react-native-ab**](https://github.com/lwansbrough/react-native-ab/) - “A component for rendering A/B tests in React Native” by [Loch Wansbrough](https://github.com/lwansbrough)
+- [**react-experiments**](https://github.com/HubSpot/react-experiments) - “A JavaScript library that assists in defining and managing UI experiments in React” by [Hubspot](https://github.com/HubSpot). Uses Facebook's [PlanOut framework](http://facebook.github.io/planout/) via [Hubspot's javascript port](https://github.com/HubSpot/PlanOut.js).
+- [**react-ab**](https://github.com/olahol/react-ab) - “Simple declarative and universal A/B testing component for React” by [Ola Holmström](https://github.com/olahol)
+- [**react-native-ab**](https://github.com/lwansbrough/react-native-ab/) - “A component for rendering A/B tests in React Native” by [Loch Wansbrough](https://github.com/lwansbrough)
 
 Please [let us know](https://github.com/pushtell/react-ab-test/issues/new) about alternate libraries not included here.
 
 ## Resources for A/B Testing with React
 
-* [Product Experimentation with React and PlanOut](http://product.hubspot.com/blog/product-experimentation-with-planout-and-react.js) on the [HubSpot Product Blog](http://product.hubspot.com/)
-* [Roll Your Own A/B Tests With Optimizely and React](http://engineering.tilt.com/roll-your-own-ab-tests-with-optimizely-and-react/) on the [Tilt Engineering Blog](http://engineering.tilt.com/)
-* [Simple Sequential A/B Testing](http://www.evanmiller.org/sequential-ab-testing.html)
-* [A/B Testing Rigorously (without losing your job)](http://elem.com/~btilly/ab-testing-multiple-looks/part1-rigorous.html)
+- [Product Experimentation with React and PlanOut](http://product.hubspot.com/blog/product-experimentation-with-planout-and-react.js) on the [HubSpot Product Blog](http://product.hubspot.com/)
+- [Roll Your Own A/B Tests With Optimizely and React](http://engineering.tilt.com/roll-your-own-ab-tests-with-optimizely-and-react/) on the [Tilt Engineering Blog](http://engineering.tilt.com/)
+- [Simple Sequential A/B Testing](http://www.evanmiller.org/sequential-ab-testing.html)
+- [A/B Testing Rigorously (without losing your job)](http://elem.com/~btilly/ab-testing-multiple-looks/part1-rigorous.html)
 
 Please [let us know](https://github.com/pushtell/react-ab-test/issues/new) about React A/B testing resources not included here.
 
@@ -425,29 +487,29 @@ Please [let us know](https://github.com/pushtell/react-ab-test/issues/new) about
 
 Experiment container component. Children must be of type [`Variant`](#variant-).
 
-* **Properties:**
-  * `name` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `userIdentifier` - Distinct user identifier. When defined, this value is hashed to choose a variant if `defaultVariantName` or a stored value is not present. Useful for [server side rendering](#server-rendering).
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"7cf61a4521f24507936a8977e1eee2d4"`
-  * `defaultVariantName` - Name of the default variant. When defined, this value is used to choose a variant if a stored value is not present. This property may be useful for [server side rendering](#server-rendering) but is otherwise not recommended.
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"A"`
+- **Properties:**
+  - `name` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `userIdentifier` - Distinct user identifier. When defined, this value is hashed to choose a variant if `defaultVariantName` or a stored value is not present. Useful for [server side rendering](#server-rendering).
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"7cf61a4521f24507936a8977e1eee2d4"`
+  - `defaultVariantName` - Name of the default variant. When defined, this value is used to choose a variant if a stored value is not present. This property may be useful for [server side rendering](#server-rendering) but is otherwise not recommended.
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"A"`
 
 ### `<Variant />`
 
 Variant container component.
 
-* **Properties:**
-  * `name` - Name of the variant.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"A"`
+- **Properties:**
+  - `name` - Name of the variant.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"A"`
 
 ### `emitter`
 
@@ -457,69 +519,69 @@ Event emitter responsible for coordinating and reporting usage. Extended from [f
 
 Emit a win event.
 
-* **Return Type:** No return value
-* **Parameters:**
-  * `experimentName` - Name of an experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
+- **Return Type:** No return value
+- **Parameters:**
+  - `experimentName` - Name of an experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
 
 #### `emitter.addActiveVariantListener([experimentName, ] callback)`
 
 Listen for the active variant specified by an experiment.
 
-* **Return Type:** [`Subscription`](#subscription)
-* **Parameters:**
-  * `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `callback` - Function to be called when a variant is chosen.
-    * **Required**
-    * **Type:** `function`
-    * **Callback Arguments:**
-      * `experimentName` - Name of the experiment.
-        * **Type:** `string`
-      * `variantName` - Name of the variant.
-        * **Type:** `string`
+- **Return Type:** [`Subscription`](#subscription)
+- **Parameters:**
+  - `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `callback` - Function to be called when a variant is chosen.
+    - **Required**
+    - **Type:** `function`
+    - **Callback Arguments:**
+      - `experimentName` - Name of the experiment.
+        - **Type:** `string`
+      - `variantName` - Name of the variant.
+        - **Type:** `string`
 
 #### `emitter.addPlayListener([experimentName, ] callback)`
 
 Listen for an experiment being displayed to the user. Trigged by the [React componentWillMount lifecycle method](https://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount).
 
-* **Return Type:** [`Subscription`](#subscription)
-* **Parameters:**
-  * `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `callback` - Function to be called when an experiment is displayed to the user.
-    * **Required**
-    * **Type:** `function`
-    * **Callback Arguments:**
-      * `experimentName` - Name of the experiment.
-        * **Type:** `string`
-      * `variantName` - Name of the variant.
-        * **Type:** `string`
+- **Return Type:** [`Subscription`](#subscription)
+- **Parameters:**
+  - `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `callback` - Function to be called when an experiment is displayed to the user.
+    - **Required**
+    - **Type:** `function`
+    - **Callback Arguments:**
+      - `experimentName` - Name of the experiment.
+        - **Type:** `string`
+      - `variantName` - Name of the variant.
+        - **Type:** `string`
 
 #### `emitter.addWinListener([experimentName, ] callback)`
 
 Listen for a successful outcome from the experiment. Trigged by the [emitter.emitWin(experimentName)](#emitteremitwinexperimentname) method.
 
-* **Return Type:** [`Subscription`](#subscription)
-* **Parameters:**
-  * `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `callback` - Function to be called when a win is emitted.
-    * **Required**
-    * **Type:** `function`
-    * **Callback Arguments:**
-      * `experimentName` - Name of the experiment.
-        * **Type:** `string`
-      * `variantName` - Name of the variant.
-        * **Type:** `string`
+- **Return Type:** [`Subscription`](#subscription)
+- **Parameters:**
+  - `experimentName` - Name of an experiment. If provided, the callback will only be called for the specified experiment.
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `callback` - Function to be called when a win is emitted.
+    - **Required**
+    - **Type:** `function`
+    - **Callback Arguments:**
+      - `experimentName` - Name of the experiment.
+        - **Type:** `string`
+      - `variantName` - Name of the variant.
+        - **Type:** `string`
 
 #### `emitter.defineVariants(experimentName, variantNames [, variantWeights])`
 
@@ -529,77 +591,77 @@ If `variantWeights` are not specified variants will be chosen at equal rates.
 
 The variants will be chosen according to the ratio of the numbers, for example variants `["A", "B", "C"]` with weights `[20, 40, 40]` will be chosen 20%, 40%, and 40% of the time, respectively.
 
-* **Return Type:** No return value
-* **Parameters:**
-  * `experimentName` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `variantNames` - Array of variant names.
-    * **Required**
-    * **Type:** `Array.<string>`
-    * **Example:** `["A", "B", "C"]`
-  * `variantWeights` - Array of variant weights.
-    * **Optional**
-    * **Type:** `Array.<number>`
-    * **Example:** `[20, 40, 40]`
+- **Return Type:** No return value
+- **Parameters:**
+  - `experimentName` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `variantNames` - Array of variant names.
+    - **Required**
+    - **Type:** `Array.<string>`
+    - **Example:** `["A", "B", "C"]`
+  - `variantWeights` - Array of variant weights.
+    - **Optional**
+    - **Type:** `Array.<number>`
+    - **Example:** `[20, 40, 40]`
 
 #### `emitter.setActiveVariant(experimentName, variantName)`
 
 Set the active variant of an experiment.
 
-* **Return Type:** No return value
-* **Parameters:**
-  * `experimentName` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `variantName` - Name of the variant.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"A"`
+- **Return Type:** No return value
+- **Parameters:**
+  - `experimentName` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `variantName` - Name of the variant.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"A"`
 
 #### `emitter.getActiveVariant(experimentName)`
 
 Returns the variant name currently displayed by the experiment.
 
-* **Return Type:** `string`
-* **Parameters:**
-  * `experimentName` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
+- **Return Type:** `string`
+- **Parameters:**
+  - `experimentName` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
 
 #### `emitter.calculateActiveVariant(experimentName [, userIdentifier, defaultVariantName])`
 
 Force calculation of active variant, even if the experiment is not displayed yet.
 Note: This method must be called after `emitter.defineVariants`
 
-* **Return Type:** `string`
-* **Parameters:**
-  * `experimentName` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
-  * `userIdentifier` - Distinct user identifier. When defined, this value is hashed to choose a variant if `defaultVariantName` or a stored value is not present. Useful for [server side rendering](#server-rendering).
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"7cf61a4521f24507936a8977e1eee2d4"`
-  * `defaultVariantName` - Name of the default variant. When defined, this value is used to choose a variant if a stored value is not present. This property may be useful for [server side rendering](#server-rendering) but is otherwise not recommended.
-    * **Optional**
-    * **Type:** `string`
-    * **Example:** `"A"`
+- **Return Type:** `string`
+- **Parameters:**
+  - `experimentName` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
+  - `userIdentifier` - Distinct user identifier. When defined, this value is hashed to choose a variant if `defaultVariantName` or a stored value is not present. Useful for [server side rendering](#server-rendering).
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"7cf61a4521f24507936a8977e1eee2d4"`
+  - `defaultVariantName` - Name of the default variant. When defined, this value is used to choose a variant if a stored value is not present. This property may be useful for [server side rendering](#server-rendering) but is otherwise not recommended.
+    - **Optional**
+    - **Type:** `string`
+    - **Example:** `"A"`
 
 #### `emitter.getSortedVariants(experimentName)`
 
 Returns a sorted array of variant names associated with the experiment.
 
-* **Return Type:** `Array.<string>`
-* **Parameters:**
-  * `experimentName` - Name of the experiment.
-    * **Required**
-    * **Type:** `string`
-    * **Example:** `"My Example"`
+- **Return Type:** `Array.<string>`
+- **Parameters:**
+  - `experimentName` - Name of the experiment.
+    - **Required**
+    - **Type:** `string`
+    - **Example:** `"My Example"`
 
 ### `Subscription`
 
@@ -609,7 +671,7 @@ Returned by the emitter's add listener methods. More information available in th
 
 Removes the listener subscription and prevents future callbacks.
 
-* **Parameters:** No parameters
+- **Parameters:** No parameters
 
 ### `experimentDebugger`
 
@@ -620,27 +682,28 @@ The debugger is wrapped in a conditional `if(process.env.NODE_ENV === "productio
 <img src="https://cdn.rawgit.com/pushtell/react-ab-test/master/documentation-images/debugger-animated-2.gif" width="325" height="325" />
 
 #### `experimentDebugger.setDebuggerAvailable(isAvailable)`
+
 Overrides `process.env.NODE_ENV` check, so it can be decided if the debugger is available
 or not at runtime. This allow, for instance, to enable the debugger in a testing environment but not in production.
 Note that you require to explicitly call to `.enable` even if you forced this to be truthy.
 
-* **Return Type:** No return value
-* **Parameters:**
-  * `isAvailable` - Tells whether the debugger is available or not
-    * **Required**
-    * **Type:** `boolean`
+- **Return Type:** No return value
+- **Parameters:**
+  - `isAvailable` - Tells whether the debugger is available or not
+    - **Required**
+    - **Type:** `boolean`
 
 #### `experimentDebugger.enable()`
 
 Attaches the debugging panel to the `<body>` element.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 #### `experimentDebugger.disable()`
 
 Removes the debugging panel from the `<body>` element.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 ### `mixpanelHelper`
 
@@ -655,15 +718,15 @@ When a [win is emitted](#emitteremitwinexperimentname) the helper sends an `Expe
 Try it [on JSFiddle](https://jsfiddle.net/pushtell/hwtnzm35/)
 
 ```js
-import React from 'react';
-import { Experiment, Variant, mixpanelHelper } from '@marvelapp/react-ab-test';
+import React from "react";
+import { Experiment, Variant, mixpanelHelper } from "@marvelapp/react-ab-test";
 
 // window.mixpanel has been set by Mixpanel's embed snippet.
 mixpanelHelper.enable();
 
 class App extends React.Component {
   onButtonClick(e) {
-    emitter.emitWin('My Example');
+    emitter.emitWin("My Example");
     // mixpanelHelper sends the 'Experiment Win' event, equivalent to:
     // mixpanel.track('Experiment Win', {Experiment: "My Example", Variant: "A"})
   }
@@ -693,13 +756,13 @@ class App extends React.Component {
 
 Add listeners to `win` and `play` events and report results to Mixpanel.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 #### `mixpanelHelper.disable()`
 
 Remove `win` and `play` listeners and stop reporting results to Mixpanel.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 ### `segmentHelper`
 
@@ -714,15 +777,15 @@ When a [win is emitted](#emitteremitwinexperimentname) the helper sends an `Expe
 Try it [on JSFiddle](https://jsfiddle.net/pushtell/ae1jeo2k/)
 
 ```js
-import React from 'react';
-import { Experiment, Variant, segmentHelper } from '@marvelapp/react-ab-test';
+import React from "react";
+import { Experiment, Variant, segmentHelper } from "@marvelapp/react-ab-test";
 
 // window.analytics has been set by Segment's embed snippet.
 segmentHelper.enable();
 
 class App extends React.Component {
   onButtonClick(e) {
-    emitter.emitWin('My Example');
+    emitter.emitWin("My Example");
     // segmentHelper sends the 'Experiment Won' event, equivalent to:
     // segment.track('Experiment Won', {experimentName: "My Example", variationName: "A"})
   }
@@ -752,13 +815,13 @@ class App extends React.Component {
 
 Add listeners to `win` and `play` events and report results to Segment.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 #### `segmentHelper.disable()`
 
 Remove `win` and `play` listeners and stop reporting results to Segment.
 
-* **Return Type:** No return value
+- **Return Type:** No return value
 
 ## How to contribute
 
@@ -766,15 +829,15 @@ Remove `win` and `play` listeners and stop reporting results to Segment.
 
 Before contribuiting you need:
 
-* [doctoc](https://github.com/thlorenz/doctoc) installed
+- [doctoc](https://github.com/thlorenz/doctoc) installed
 
 Then you can:
 
-* Apply your changes :sunglasses:
-* Build your changes with `yarn build`
-* Test your changes with `yarn test`
-* Lint your changes with `yarn lint`
-* And finally open the PR! :tada:
+- Apply your changes :sunglasses:
+- Build your changes with `yarn build`
+- Test your changes with `yarn test`
+- Lint your changes with `yarn lint`
+- And finally open the PR! :tada:
 
 ### Running Tests
 
